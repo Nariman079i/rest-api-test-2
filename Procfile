@@ -1,1 +1,1 @@
-web: gunicorn Sity.wsgi --log-file
+web: pipenv run python src/manage.py runserver $PORT

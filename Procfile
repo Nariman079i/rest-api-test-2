@@ -1,1 +1,1 @@
-web: gunicorn Sity.wsgi:app
+web: gunicorn Sity.wsgi:application

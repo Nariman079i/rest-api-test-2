@@ -15,4 +15,3 @@ class Users(models.Model):
 class Industrial(models.Model):
     title = models.CharField(max_length=40,primary_key=True)
 
-

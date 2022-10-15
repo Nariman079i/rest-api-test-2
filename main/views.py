@@ -1,5 +1,6 @@
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render , redirect , HttpResponse
+from django.db.models import *
 from django.views.generic import *
 from rest_framework.generics import *
 from .forms import *
@@ -29,7 +30,11 @@ def index(requests):
             'password': requests.user.password,
             'email': requests.user.email
         }
+        chat = {
+            'users': User.objects.all()
+        }
         context['data'] = data
+        context.update(**chat)
     else:
         data = {
             'Registrarion': "{% url  'register' %}",
@@ -38,6 +43,29 @@ def index(requests):
         context['data'] = data
     file = 'main/index.html'
     return render(requests, file, context=context)
+
+def chat(requests, user_id):
+    context = dict()
+    if not requests.user.is_authenticated:
+        return redirect('login')
+    else:
+        data = {
+            'doner': requests.user,
+            'recip': User.objects.get(pk=user_id),
+            'messages': Chat.objects.filter(Q(doner=requests.user) | Q(doner__pk=user_id) , Q(recip=requests.user) | Q(recip__pk=user_id))
+        }
+        context.update(**data)
+        if requests.method == 'POST':
+            form = SendMessage(requests.POST)
+            if form.is_valid():
+                mess = form.cleaned_data['message']
+                Chat.objects.create(doner=requests.user,recip=context['recip'] , message=mess)
+                return redirect('chat',user_id=user_id)
+        else:
+            context['form'] = SendMessage()
+            file = 'main/chat.html'
+            return render(requests, file, context=context)
+
 
 def register_user(requests):
     if requests.user.is_authenticated:
@@ -50,14 +78,17 @@ def register_user(requests):
                 email_ = form.cleaned_data['email']
                 password1 = form.cleaned_data['password1']
                 password2 = form.cleaned_data['password2']
-                user = User.objects.create_user(
-                    username=username,
-                    email=email_,
-                    password=password1,
-                )
-                user.save()
-                auth_user = authenticate(requests,username=username, password=password1)
-                login(requests,auth_user)
+                try:
+                    user = User.objects.create_user(
+                        username=username,
+                        email=email_,
+                        password=password1,
+                    )
+                    user.save()
+                    auth_user = authenticate(requests,username=username, password=password1)
+                    login(requests,auth_user)
+                except:
+                    form.error_messages("Password error!")
                 return redirect('main')
         else:
             form = RegisterForms()

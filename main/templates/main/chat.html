@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h5>{{ recip }}</h5>
+
+    </div>
+    <div style="width: 400px; border: 2px solid saddlebrown">
+        {% for mess  in messages %}
+        {% if mess.doner == doner %}
+            <p align="right">{{ mess.message }}</p><br>
+        {% else %}
+            <p align="left">{{ mess.message }}</p><br>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div style="width: 400px; border: 2px solid rebeccapurple">
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>

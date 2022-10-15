@@ -52,7 +52,7 @@ def chat(requests, user_id):
         data = {
             'doner': requests.user,
             'recip': User.objects.get(pk=user_id),
-            'messages': Chat.objects.filter(Q(doner=requests.user) | Q(doner__pk=user_id) , Q(recip=requests.user) | Q(recip__pk=user_id))
+            'messages': Chat.objects.filter(Q(doner=requests.user) | Q(doner__pk=user_id) , Q(recip=requests.user) | Q(recip__pk=user_id)).order_by('pk')
         }
         context.update(**data)
         if requests.method == 'POST':
